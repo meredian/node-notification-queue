@@ -1,47 +1,66 @@
 var gulp = require('gulp');
-var db = require('./lib/db');
+var runSequence = require('run-sequence');
+var argv = require('yargs').argv;
 
+var db = require('./lib/db');
 var utils = require('./lib/utils');
+
 
 gulp.task("db:reset", function() {
     return db.connect().then(function(db) {
         return db.dropDatabase().then(function() {
-            db.close();
+            return db.close();
         });
-    })
+    });
 });
 
 gulp.task("db:seed", function() {
-    var seedSize = 500000;
-    var seedStep = 100000;
-    var names = new utils.NameSet(10000);
+    console.log("You can use --seed-size x, --seed-step x and --name-count x parameters to configure task");
+    var seedSize = argv.seedSize || 10000000;
+    var seedStep = argv.seedStep || 1000000;
+    var nameCount = argv.nameCount || 10000;
+    var names = new utils.NameSet(nameCount);
     return db.connect().then(function(db) {
-        console.log('Seedind collection "players"; seed size: %d', seedSize);
-        var chain;
-        var seedRange = function(min, max) {
-            console.log("Seeding range (%d, %d)", min, max);
+        console.log('Seedind "players" in "%s"', db.databaseName);
+        console.log("Seed size: %d; Step size: %d; Name dictionary size: %d", seedSize, seedStep, nameCount);
+
+        // Using async iteration because promises age generated too fast and clog memory
+        var seedRange = function(min, max, callback) {
+            console.log("Seeding range [%d, %d)", min, max);
             var data = utils.shuffledIntRange(min, max).map(function(id) {
                 return {
                     vk_id: id,
                     first_name: names.sample()
-                }
+                };
             });
-            return db.collection('players').insertMany(data);
+            return db.collection('players').insertMany(data, callback);
         };
 
-        for (var i = 0; i < seedSize; i += seedStep ) {
-            var step = seedRange(i, Math.min(seedSize, i + seedStep - 1));
-            chain = chain ? chain.then(step) : step;
-        }
+        var seedIterator = function(seed, callback) {
+            if (seed < seedSize) {
+                seedRange(seed, Math.min(seedSize, seed + seedStep), function(err, result) {
+                    if (err) {
+                        callback(err);
+                    } else {
+                        seedIterator(seed + seedStep, callback);
+                    }
+                });
+            } else {
+                callback();
+            }
+        };
 
-        return chain.then(function() {
-            return db.collection('players').count()
+
+        return new Promise(function(resolve) {
+            seedIterator(0, resolve);
+        }).then(function() {
+            return db.collection('players').count();
         }).then(function(result) {
-            console.log('Done seeding collection "players"; Total collection size: %d', result);
             db.close();
+            console.log('Done seeding "players" in "%s"; Total collection size: %d', db.databaseName, result);
         });
-    })
+    });
 });
 
-gulp.task("db:recreate", ["db:reset", "db:seed"]);
+gulp.task("db:recreate", function(callback) { runSequence("db:reset", "db:seed", callback); });
 

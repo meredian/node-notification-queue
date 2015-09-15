@@ -16,6 +16,8 @@
     "mongodb": "^2.0.43"
   },
   "devDependencies": {
-    "gulp": "^3.9.0"
+    "gulp": "^3.9.0",
+    "run-sequence": "^1.1.2",
+    "yargs": "^3.25.0"
   }
 }
