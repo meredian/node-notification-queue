@@ -6,7 +6,7 @@ Nofitication service test assignment for PlayKot. `notificationApi` is a stub fo
 ## Prerequisites
 
 * Node.js `4.0.x`
-* MondoDB (???)
+* MondoDB `3.0.x`
 
 ## Installation
 
