@@ -1,0 +1,9 @@
+---
+    name: node-notification-playkot
+    port: 3000
+    mongo_db:
+        host: 127.0.0.1
+        port: 27017
+        user:
+        password:
+        database: notifications_development
