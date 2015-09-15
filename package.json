@@ -1,0 +1,12 @@
+{
+  "name": "node-notification-playkot",
+  "version": "1.0.0",
+  "description": "Nofitication service test assignment",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "engines" : { "node" : "^4.0" },
+  "author": "Anton Sidelnikov",
+  "license": "MIT"
+}
