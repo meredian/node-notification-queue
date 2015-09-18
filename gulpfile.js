@@ -6,6 +6,24 @@ var argv = require('yargs').argv;
 
 var db = require('./lib/db');
 var utils = require('./lib/utils');
+var TaskProcessor = require('./lib/taskProcessor');
+
+gulp.task('task:plain', function() {
+    return db.connect().then((db) => {
+        var taskProcessor = new TaskProcessor(db);
+        return taskProcessor.createTask('This is message!');
+    }).catch((e) => {
+        console.log(e.stack);
+    });
+});
+
+gulp.task('task:named', function() {
+    return db.connect().then((db) => {
+        var taskProcessor = new TaskProcessor(db);
+        return taskProcessor.createTask('This is message, %name%!');
+    });
+});
+
 gulp.task('db:measure', function() {
     return db.connect().then((db) => {
         return db.command({distinct: 'players', key:'first_name', query: {}}).then((res) => {
@@ -46,7 +64,7 @@ gulp.task('db:seed', function() {
         console.log(`Seedind "players" in "${db.databaseName}"`);
         console.log(`Seed size: ${seedSize}; Step size: ${seedStep}; Name dictionary size: ${nameCount}`);
 
-        // Using async iteration because promises age generated too fast and clog memory
+        // Using callback iteration because promises are generated too fast and clog memory
         var seedRange = function(min, max, callback) {
             console.log('Seeding range [%d, %d)', min, max);
             var data = utils.shuffledIntRange(min, max).map((id) => {
@@ -61,25 +79,18 @@ gulp.task('db:seed', function() {
         var seedIterator = function(seed, callback) {
             if (seed < seedSize) {
                 seedRange(seed, Math.min(seedSize, seed + seedStep), (err) => {
-                    if (err) {
-                        callback(err);
-                    } else {
-                        seedIterator(seed + seedStep, callback);
-                    }
+                    return err ? callback(err) : seedIterator(seed + seedStep, callback);
                 });
             } else {
                 callback();
             }
         };
 
-
-        return new Promise((resolve) => {
-            seedIterator(0, resolve);
-        }).then(() => {
+        return utils.promisify(seedIterator)(0).then(() => {
             return db.collection('players').count();
         }).then((result) => {
-            db.close();
             console.log(`Done seeding "players" in "${db.databaseName}"; Total collection size: ${result}`);
+            return db.close();
         });
     });
 });
