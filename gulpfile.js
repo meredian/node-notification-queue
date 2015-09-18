@@ -4,11 +4,31 @@ var argv = require('yargs').argv;
 
 var db = require('./lib/db');
 var utils = require('./lib/utils');
+gulp.task('db:measure', function() {
+    return db.connect().then((db) => {
+        return db.command({distinct: 'players', key:'first_name', query: {}}).then((res) => {
+            console.log('Request: db.players.distict(first_name); Stats:', res.stats);
+            var name = utils.sample(res.values);
+            return db.command({distinct: 'players', key:'vk_id', query: {first_name: name}});
+        }).then((res) => {
+            console.log('Request: db.players.distict(vk_id, {first_name: name}); Stats:', res.stats);
+            return db.close();
+        });
+    });
+});
 
 
 gulp.task('db:reset', function() {
     return db.connect().then((db) => {
         return db.dropDatabase().then(() => {
+            return db.close();
+        });
+    });
+});
+
+gulp.task('db:indices', function() {
+    return db.connect().then((db) => {
+        return db.createIndex('players', {first_name: 1, vk_id: 1}).then(() => {
             return db.close();
         });
     });
@@ -62,5 +82,5 @@ gulp.task('db:seed', function() {
     });
 });
 
-gulp.task('db:recreate', function(callback) { runSequence('db:reset', 'db:seed', callback); });
+gulp.task('db:recreate', function(callback) { runSequence('db:reset', 'db:seed', 'db:indices', callback); });
 
