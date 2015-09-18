@@ -12,11 +12,13 @@
   "author": "Anton Sidelnikov",
   "license": "MIT",
   "dependencies": {
+    "harmony-reflect": "^1.4.2",
     "js-yaml": "^3.4.2",
     "mongodb": "^2.0.43"
   },
   "devDependencies": {
     "gulp": "^3.9.0",
+    "harmonize": "^1.4.4",
     "run-sequence": "^1.1.2",
     "yargs": "^3.25.0"
   }

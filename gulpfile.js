@@ -1,3 +1,5 @@
+require('harmonize')();
+
 var gulp = require('gulp');
 var runSequence = require('run-sequence');
 var argv = require('yargs').argv;
