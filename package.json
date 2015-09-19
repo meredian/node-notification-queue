@@ -1,15 +1,16 @@
 {
-  "name": "node-notification-playkot",
+  "name": "node-notification-queue",
   "version": "1.0.0",
-  "description": "Nofitication service test assignment",
+  "description": "Sample nofitication queue server",
   "main": "lib/server.js",
   "scripts": {
+    "start": "node lib/server.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "engines": {
     "node": "^4.0"
   },
-  "author": "Anton Sidelnikov",
+  "author": "Anton Sidelnikov <ndmeredian@gmail.com>",
   "license": "MIT",
   "dependencies": {
     "bunyan": "^1.5.1",
