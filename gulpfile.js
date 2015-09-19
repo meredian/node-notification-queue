@@ -6,20 +6,20 @@ var argv = require('yargs').argv;
 
 var db = require('./lib/db');
 var utils = require('./lib/utils');
-var TaskProcessor = require('./lib/taskProcessor');
+var TaskQueue = require('./lib/taskQueue');
 
 gulp.task('task:plain', function() {
     return db.connect().then((db) => {
-        var taskProcessor = new TaskProcessor(db);
-        return taskProcessor.createTask('This is message!');
-    }).catch((e) => {
-        console.log(e.stack);
+        var taskQueue = new TaskQueue(db);
+        return taskQueue.createTask('This is message!').then(() => {
+            return taskQueue.createTask('This is other message');
+        });
     });
 });
 
-gulp.task('task:named', function() {
+gulp.task('task:nominal', function() {
     return db.connect().then((db) => {
-        var taskProcessor = new TaskProcessor(db);
+        var taskProcessor = new TaskQueue(db);
         return taskProcessor.createTask('This is message, %name%!');
     });
 });

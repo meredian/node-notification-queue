@@ -2,7 +2,7 @@
   "name": "node-notification-playkot",
   "version": "1.0.0",
   "description": "Nofitication service test assignment",
-  "main": "index.js",
+  "main": "lib/server.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -12,14 +12,17 @@
   "author": "Anton Sidelnikov",
   "license": "MIT",
   "dependencies": {
+    "bunyan": "^1.5.1",
+    "harmonize": "^1.4.4",
     "harmony-reflect": "^1.4.2",
     "js-yaml": "^3.4.2",
     "limiter": "^1.0.5",
-    "mongodb": "^2.0.43"
+    "lodash": "^3.10.1",
+    "mongodb": "^2.0.43",
+    "restify": "^4.0.2"
   },
   "devDependencies": {
     "gulp": "^3.9.0",
-    "harmonize": "^1.4.4",
     "run-sequence": "^1.1.2",
     "yargs": "^3.25.0"
   }
