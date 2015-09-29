@@ -1,7 +1,7 @@
 node-notification-queue
 =======================
 
-Nofitication service test assignment for PlayKot. `NotificationApi` is a stub for VK.com API
+Nofitication service test assignment. `NotificationApi` is a stub for VK.com API
 
 ## Prerequisites
 
